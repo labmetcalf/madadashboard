@@ -10,7 +10,7 @@ output:
       - { title: "<img style=\"width: 16px;\" src=\"www/us16.png\" />   English", href: "index.html"}
      
 params:
-  lang: "EN"
+  lang: "ENGLISH"
 ---
 
 <!-- Google Tag Manager -->
@@ -39,13 +39,12 @@ library(glue)
 
 
 ```{r}
-
 # pull data from google sheets & clean
 gs4_deauth()
-data <- read_sheet("https://docs.google.com/spreadsheets/d/1oQJl4HiTviKAAhCjMmg0ipGcO79cZg6gSHrdTuQID_w/edit#gid=0", sheet = 2)
-test <- read_sheet("https://docs.google.com/spreadsheets/d/1oQJl4HiTviKAAhCjMmg0ipGcO79cZg6gSHrdTuQID_w/edit#gid=0", sheet = 3)
+data   <- read_sheet("https://docs.google.com/spreadsheets/d/1oQJl4HiTviKAAhCjMmg0ipGcO79cZg6gSHrdTuQID_w/edit#gid=0", sheet = 2)
+test   <- read_sheet("https://docs.google.com/spreadsheets/d/1oQJl4HiTviKAAhCjMmg0ipGcO79cZg6gSHrdTuQID_w/edit#gid=0", sheet = 3)
 events <- read_sheet("https://docs.google.com/spreadsheets/d/1oQJl4HiTviKAAhCjMmg0ipGcO79cZg6gSHrdTuQID_w/edit#gid=0", sheet = 5)
-text <- read_sheet("https://docs.google.com/spreadsheets/d/14N9y4A9MLeYeNyAIdWRwluwhSxQdBi7DT_2CDuf_LUg/edit#gid=0")
+text   <- read_sheet("https://docs.google.com/spreadsheets/d/1oQJl4HiTviKAAhCjMmg0ipGcO79cZg6gSHrdTuQID_w/edit#gid=0", sheet = 6)
 
 # shapefiles
 mdg2 <- read_sf("data/regions/MDG_ADM1.shp")

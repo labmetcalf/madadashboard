@@ -10,7 +10,7 @@ output:
       - { title: "<img style=\"width: 16px;\" src=\"www/us16.png\" />   English", href: "index.html"}
      
 params:
-  lang: "FRA"
+  lang: "MDG"
 ---
 
 <!-- Google Tag Manager -->

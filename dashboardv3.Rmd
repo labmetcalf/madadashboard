@@ -35,6 +35,9 @@ library(zoo)
 library(forecast)
 library(stringdist)
 library(glue)
+library(ggthemes)
+library(scales)
+library(RColorBrewer)
 ```
 
 
@@ -263,8 +266,56 @@ map %>%addProviderTiles(providers$Esri.WorldStreetMap)
 
 `r format(f.tr("COVID_in_mada_part_5"))`
 
-`r paste0(f.tr("COVID_in_mada_part_6")), round(last(na.trim(ntl.cases$tests.mov.avg)), 2)`
+`r paste0(f.tr("COVID_in_mada_part_6"), "**", round(last(na.trim(ntl.cases$tests.mov.avg)), 2), "**")`
 
+`r format(f.tr("COVID_in_mada_part_7A"))` **`r format(last(cases_by_date$Date),format="%B %d %Y")`** `r format(f.tr("COVID_in_mada_part_7B"))` **`r format(sum(cases_by_date$cases),big.mark = ",")`** `r format(f.tr("COVID_in_mada_part_7C"))` **`r n_distinct(data$Location4,na.rm=TRUE)`** `r format(f.tr("COVID_in_mada_part_7D"))` **`r length(deaths$Id)`** `r format(f.tr("COVID_in_mada_part_7E"))`
+
+Row {data-width=650}
+-----------------------------------------------------------------------
+
+
+### `r format(f.tr("time_series_a_header"))`
+
+```{r}
+IRD_curve_labels <- c(f.tr("time_series_a_label_cases"), f.tr("time_series_a_label_recovered"), f.tr("time_series_a_label_deaths"))
+IRD_curve_breaks <- c(f.tr("time_series_a_break_cases"), f.tr("time_series_a_break_recovered"), f.tr("time_series_a_break_deaths"))
+
+plot.IRD <- IRD %>% 
+  mutate(Label = case_when(
+           Type == "N" ~ f.tr("time_series_a_label_cases"),
+           Type == "R" ~ f.tr("time_series_a_label_recovered"),
+           Type == "D" ~ f.tr("time_series_a_label_deaths")
+         ))
+plot.IRD$Label <- factor(plot.IRD$Label, levels = c(f.tr("time_series_a_label_deaths"), 
+                                                    f.tr("time_series_a_label_cases"), 
+                                                    f.tr("time_series_a_label_recovered")))
+
+ggplot(data=plot.IRD, aes(x=Date,y=Type.cum.sum,fill=Label))+
+  geom_area(data=plot.IRD, aes(x=Date,y=Type.cum.sum,fill=Label),alpha=0.7,size=2,position="dodge")+
+  scale_fill_discrete(labels=IRD_curve_labels, breaks=IRD_curve_breaks)+
+  scale_x_date(date_breaks = "2 weeks")+
+  theme(panel.background=element_blank(),axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x=f.tr("time_series_a_xlab"), y=f.tr("time_series_a_ylab"))->IRD_curve
+ggplotly(IRD_curve)
+```
+
+
+### **Cumulative number of cases**: How many cases were detected in each region through time?
+
+
+```{r}
+colourCount =length(unique(cases_by_date$region))
+mycolors <- colorRampPalette(brewer.pal(8, "Paired"))(colourCount)
+plot.cases_by
+
+
+
+ggplot(data=cases_by_date,aes(x=Date,y=cum.sum,fill=region))+
+  geom_area(data=cases_by_date,aes(x=Date,y=cum.sum,fill=region),size=0.75)+
+  scale_fill_manual(values=mycolors)+scale_x_date(date_breaks = "2 weeks")+theme(panel.background=element_blank(),axis.text.x = element_text(angle = 45, hjust = 1))+labs(y="Number of cases")->cumulative_cases
+ggplotly(cumulative_cases)
+
+```
 
 
 

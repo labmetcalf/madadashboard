@@ -10,7 +10,7 @@ output:
       - { title: "<img style=\"width: 16px;\" src=\"www/us16.png\" />   English", href: "index.html"}
      
 params:
-  lang: "ENGLISH"
+  lang: "EN"
 ---
 
 <!-- Google Tag Manager -->
@@ -65,8 +65,8 @@ cases_by_date <- as.data.frame(xtabs( ~ Date+region , cases))
 cases_by_date$Date<-as.Date(cases_by_date$Date)
 cases_by_date%>%rename(cases=Freq)%>%
   group_by(region)%>%
-  mutate(cum.sum=cumsum(cases))%>%#compute cumulative number of cases per region
-  mutate(mov.avg=rollmeanr(cases,7,fill="extend"))->cases_by_date#compute 7 days moving average per region
+  mutate(cum.sum=cumsum(cases))%>% #compute cumulative number of cases per region
+  mutate(mov.avg=rollmeanr(cases,7,fill="extend"))->cases_by_date #compute 7 day moving average per region
 
 deaths$Age<-as.numeric(deaths$Age)
 deaths_by_date<-as.data.frame(xtabs( ~ Date+region , deaths))
@@ -88,11 +88,11 @@ IRD%>%
 
 
 ##testing
-
 test %>%select("Date"=Date,"Cum.cases"=Cum.cases,"New.cases"=new.cases, "Total.tests"=Global.total.test)%>%arrange(Date)->test
 
 Diff.previous<-data.frame("Date"=test$Date[c(2:length(test$Total.tests))],
-                          "tests.diff"=diff(test$Total.tests, lag = 1,na.rm=T),                                        "time.diff"=as.integer(diff.Date(test$Date)))%>%
+                          "tests.diff"=diff(test$Total.tests, lag = 1,na.rm=T),
+                          "time.diff"=as.integer(diff.Date(test$Date)))%>%
   filter(!is.na(tests.diff)&time.diff==1)#table of daily test (when  there is exactly 1 day between two available "numbers of tests")
 
 data%>%
@@ -107,7 +107,8 @@ data%>%
   mutate(tests.mov.avg=rollmeanr(tests.diff,5,fill="extend"))%>%
   mutate(positivity=(n.cases/tests.diff)*100)%>%
   mutate(positivity.mov.avg=rollmeanr(positivity,5,fill="extend"))%>%
-  select(Date,n.cases,cum.cases,mov.avg,n.deaths,cum.deaths,d.mov.avg,n.tests=tests.diff,cum.tests=Total.tests,tests.mov.avg,positivity,positivity.mov.avg)-> ntl.cases
+  select(Date, n.cases, cum.cases, mov.avg, n.deaths, cum.deaths, d.mov.avg, n.tests=tests.diff, cum.tests=Total.tests,
+         tests.mov.avg,positivity, positivity.mov.avg)-> ntl.cases
 
 
 ntl.cases<-ntl.cases[order(ntl.cases$Date,na.last=FALSE),]
@@ -117,38 +118,19 @@ ntl.cases$Date<-as.Date(ntl.cases$Date)
 ```
 
 ``` {r translation}
-# Set up language for rest of dashboard
-text <- mutate(text, lang = get(params$lang))
+#Seting up language for rest of dashboard
+#Selecting only the column with the text corresponding to the selected language
+c.lang <- params$lang
+text <- text %>% select("ref", c.lang)
 
-# helper functions to pull correct language (defaults to English when no available translation)
-
-# larger chunks of text by a reference
-translate <- function(ref) {
-  txt <- text$lang[text$ref %in% ref]
-  if (identical(txt, character(0)) | is.na(txt)) {
-    glue(text$EN[text$ref %in% ref])
-  } else {
-    glue(txt)
-  }
+#Writing a helper function to pull the language specified in params above
+f.tr <- function(ref){
+  txt <- as.character(text[text$ref == ref, 2])
+  return(txt)
 }
-
-# single line by the actual text in English
-translate.sl <- function(sl) {
-  txt <- text$lang[text$EN %in% sl]
-  if (identical(txt, character(0)) | is.na(txt)) {
-    glue(text$EN[text$EN %in% sl])
-  } else {
-    glue(txt)
-  }
-}
-
-# Notes on translation:
-# For longer chunks you can use the ref column to match your text
-# For single line labels etc, you can just search for the English text (see the value boxes as an example!)
-# See the google sheet linked here for translations, write the translations using Rmd syntax!
 ```
 
-Country profile: Madagascar
+Country profile: Madagascar :: `r format(f.tr("tab_title"))`
 ========================================================================
 
 Sidebar {.sidebar}
